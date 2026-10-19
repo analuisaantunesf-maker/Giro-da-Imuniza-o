@@ -55,12 +55,9 @@
       cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
+    button:disabled { opacity: 0.5; cursor: wait; }
     #jogo { display: none; }
+    #mensagem { color: #853f91; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -79,39 +76,69 @@
           autocomplete="nickname"
           required
         >
-        <button type="submit">Iniciar jogo</button>
+        <button id="botaoIniciar" type="submit">Iniciar jogo</button>
+        <p id="mensagem" role="status"></p>
       </form>
     </section>
 
     <section id="jogo">
       <h1>Vamos começar!</h1>
       <p>Bem-vindo(a), <strong id="jogador"></strong>.</p>
-      <p>Sua identificação foi recebida nesta página.</p>
-      <p>Na próxima etapa, vamos conectar esta tela à Roda de Palavras.</p>
+      <p>Seu nome foi registrado. Sua pontuação inicial é zero.</p>
+      <p>Em breve, conectaremos esta tela à Roda de Palavras.</p>
       <button id="voltar" type="button">Voltar</button>
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = "https://slejqzzftvrwotifuszc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_1AOWNM1KRkErfqfTCfeWfg_rmQzpO6I";
+
+    const cliente = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
     const formulario = document.getElementById("formulario");
     const campoNome = document.getElementById("nome");
+    const mensagem = document.getElementById("mensagem");
+    const botao = document.getElementById("botaoIniciar");
     const identificacao = document.getElementById("identificacao");
     const telaJogo = document.getElementById("jogo");
 
-    formulario.addEventListener("submit", function(evento) {
+    formulario.addEventListener("submit", async function(evento) {
       evento.preventDefault();
 
       const nome = campoNome.value.trim();
       if (!nome) return;
 
-      document.getElementById("jogador").textContent = nome;
-      identificacao.style.display = "none";
-      telaJogo.style.display = "block";
+      botao.disabled = true;
+      mensagem.textContent = "Registrando participante...";
+
+      try {
+        const { error } = await cliente
+          .from("ranking")
+          .insert([{ nome: nome, pontuacao: 0 }]);
+
+        if (error) throw error;
+
+        document.getElementById("jogador").textContent = nome;
+        identificacao.style.display = "none";
+        telaJogo.style.display = "block";
+      } catch (erro) {
+        console.error(erro);
+        mensagem.textContent =
+          "Não foi possível registrar. Confira a conexão e tente novamente.";
+      } finally {
+        botao.disabled = false;
+      }
     });
 
     document.getElementById("voltar").addEventListener("click", function() {
       telaJogo.style.display = "none";
       identificacao.style.display = "block";
+      mensagem.textContent = "";
     });
   </script>
 </body>
