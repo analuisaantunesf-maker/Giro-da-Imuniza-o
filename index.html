@@ -11,9 +11,6 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       padding: 20px;
       background: #f4f0f7;
       font-family: Arial, sans-serif;
@@ -22,8 +19,9 @@
 
     .cartao {
       width: 100%;
-      max-width: 420px;
-      padding: 32px 24px;
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 28px 20px;
       text-align: center;
       background: white;
       border-radius: 20px;
@@ -35,6 +33,7 @@
 
     input {
       width: 100%;
+      max-width: 400px;
       padding: 14px;
       margin: 12px 0;
       border: 1px solid #c9bfd0;
@@ -44,6 +43,7 @@
 
     button {
       width: 100%;
+      max-width: 400px;
       padding: 14px;
       margin-top: 8px;
       border: none;
@@ -58,6 +58,31 @@
     button:disabled { opacity: 0.5; cursor: wait; }
     #jogo { display: none; }
     #mensagem { color: #853f91; font-size: 14px; }
+
+    .moldura-jogo {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 177.78%;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #f4f0f7;
+    }
+
+    .moldura-jogo iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    @media (min-width: 650px) {
+      .moldura-jogo {
+        max-width: 450px;
+        margin: 20px auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -76,17 +101,30 @@
           autocomplete="nickname"
           required
         >
+        <br>
         <button id="botaoIniciar" type="submit">Iniciar jogo</button>
         <p id="mensagem" role="status"></p>
       </form>
     </section>
 
     <section id="jogo">
-      <h1>Vamos começar!</h1>
-      <p>Bem-vindo(a), <strong id="jogador"></strong>.</p>
-      <p>Seu nome foi registrado. Sua pontuação inicial é zero.</p>
-      <p>Em breve, conectaremos esta tela à Roda de Palavras.</p>
-      <button id="voltar" type="button">Voltar</button>
+      <h1>Conexão Saúde</h1>
+      <p>Boa atividade, <strong id="jogador"></strong>!</p>
+      <p>Responda às dicas na Roda de Palavras abaixo.</p>
+
+      <div class="moldura-jogo">
+        <iframe
+          title="Conexão Saúde — Roda de Palavras"
+          src="https://view.genially.com/6ad66b4ff18c74e07e7a2fac"
+          allowfullscreen
+          scrolling="yes">
+        </iframe>
+      </div>
+
+      <p id="statusPontuacao">
+        Seu cadastro foi registrado. A pontuação automática ainda não está conectada.
+      </p>
+      <button id="voltar" type="button">Voltar à identificação</button>
     </section>
   </main>
 
@@ -126,6 +164,7 @@
         document.getElementById("jogador").textContent = nome;
         identificacao.style.display = "none";
         telaJogo.style.display = "block";
+        window.scrollTo(0, 0);
       } catch (erro) {
         console.error(erro);
         mensagem.textContent =
@@ -139,6 +178,7 @@
       telaJogo.style.display = "none";
       identificacao.style.display = "block";
       mensagem.textContent = "";
+      window.scrollTo(0, 0);
     });
   </script>
 </body>
