@@ -4,132 +4,444 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conexão Saúde</title>
+  <title>Conexão Saúde | Jogo Educativo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    * { box-sizing: border-box; }
+    :root {
+      --roxo: #853f91;
+      --roxo-escuro: #54235f;
+      --rosa: #f2dff4;
+      --fundo: #faf7fb;
+      --texto: #30243b;
+      --verde: #218653;
+      --vermelho: #bd3545;
+      --borda: #e4d9e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      min-height: 100vh;
       padding: 20px;
-      background: #f4f0f7;
-      font-family: Arial, sans-serif;
-      color: #30243b;
+      background: var(--fundo);
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .cabecalho {
+      text-align: center;
+      margin: 10px 0 22px;
+    }
+
+    .cabecalho h1 {
+      color: var(--roxo);
+      margin-bottom: 8px;
+    }
+
+    .cabecalho p {
+      margin-top: 0;
+      color: #66576c;
     }
 
     .cartao {
-      width: 100%;
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 28px 20px;
-      text-align: center;
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 8px 30px #30243b18;
+      border: 1px solid var(--borda);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px #3921430c;
     }
 
-    h1 { color: #853f91; }
-    p { line-height: 1.6; }
+    h2 {
+      margin-top: 0;
+      color: var(--roxo-escuro);
+    }
 
-    input {
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-weight: bold;
+    }
+
+    input, select {
+      display: block;
       width: 100%;
-      max-width: 400px;
-      padding: 14px;
-      margin: 12px 0;
-      border: 1px solid #c9bfd0;
+      padding: 13px;
+      border: 1px solid #cfc2d4;
       border-radius: 10px;
       font-size: 16px;
+      color: var(--texto);
+      background: white;
     }
 
     button {
-      width: 100%;
-      max-width: 400px;
-      padding: 14px;
-      margin-top: 8px;
-      border: none;
-      border-radius: 10px;
-      background: #853f91;
-      color: white;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
       cursor: pointer;
-    }
-
-    button:disabled { opacity: 0.5; cursor: wait; }
-    #jogo { display: none; }
-    #mensagem { color: #853f91; font-size: 14px; }
-
-    .moldura-jogo {
-      position: relative;
-      width: 100%;
-      height: 0;
-      padding-bottom: 177.78%;
-      overflow: hidden;
-      border-radius: 12px;
-      background: #f4f0f7;
-    }
-
-    .moldura-jogo iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
       border: 0;
+      border-radius: 10px;
+      padding: 12px 15px;
+      transition: opacity 0.15s;
     }
 
-    @media (min-width: 650px) {
-      .moldura-jogo {
-        max-width: 450px;
-        margin: 20px auto;
+    button:hover {
+      opacity: 0.88;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .principal {
+      background: var(--roxo);
+      color: white;
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .secundario {
+      background: var(--rosa);
+      color: var(--roxo-escuro);
+    }
+
+    .perigo {
+      background: #fbe8ea;
+      color: #9f2435;
+    }
+
+    .oculto {
+      display: none !important;
+    }
+
+    .central {
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .estatisticas {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .estatistica {
+      text-align: center;
+      background: #f7eff9;
+      border-radius: 12px;
+      padding: 13px 5px;
+    }
+
+    .estatistica strong {
+      display: block;
+      font-size: 21px;
+      color: var(--roxo-escuro);
+      margin-top: 5px;
+    }
+
+    .rotulo {
+      font-size: 12px;
+      color: #66576c;
+    }
+
+    #cronometro.urgente {
+      color: var(--vermelho);
+    }
+
+    .letras {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 9px;
+      margin: 18px 0;
+    }
+
+    .letra {
+      aspect-ratio: 1 / 1;
+      min-width: 0;
+      padding: 4px;
+      border-radius: 50%;
+      background: var(--rosa);
+      color: var(--roxo-escuro);
+      border: 2px solid transparent;
+      font-size: 21px;
+    }
+
+    .letra.ativa {
+      background: var(--roxo);
+      color: white;
+      border-color: var(--roxo-escuro);
+    }
+
+    .letra.correta {
+      background: #d8f2e2;
+      color: #17673c;
+    }
+
+    .letra.pulada {
+      background: #eeeeee;
+      color: #555;
+    }
+
+    .letra.correta.ativa {
+      background: var(--verde);
+      color: white;
+    }
+
+    .letra.pulada.ativa {
+      background: #666;
+      color: white;
+    }
+
+    .dica-texto {
+      background: #fbf6dc;
+      border-radius: 10px;
+      padding: 12px;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    .botoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .botoes button {
+      flex: 1;
+    }
+
+    .mensagem {
+      min-height: 24px;
+      line-height: 1.5;
+      margin-top: 14px;
+      font-weight: bold;
+    }
+
+    .resposta-certa {
+      color: var(--verde);
+    }
+
+    .resposta-errada {
+      color: var(--vermelho);
+    }
+
+    .nota {
+      color: #66576c;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .ranking-linha {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--borda);
+      padding: 12px 0;
+    }
+
+    .ranking-linha:last-child {
+      border-bottom: 0;
+    }
+
+    .ranking-pontos {
+      font-weight: bold;
+      color: var(--roxo);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+
+      .cartao {
+        padding: 17px;
+      }
+
+      .estatisticas {
+        gap: 5px;
+      }
+
+      .estatistica strong {
+        font-size: 17px;
+      }
+
+      .letras {
+        gap: 6px;
+      }
+
+      .letra {
+        font-size: 18px;
       }
     }
   </style>
 </head>
-<body>
-  <main class="cartao">
-    <section id="identificacao">
-      <h1>Conexão Saúde</h1>
-      <p>Roda de Palavras: Sarampo e Poliomielite</p>
-      <p>Digite seu nome ou apelido para começar.</p>
 
-      <form id="formulario">
-        <input
-          id="nome"
-          type="text"
-          placeholder="Seu nome ou apelido"
-          maxlength="40"
-          autocomplete="nickname"
-          required
-        >
-        <br>
-        <button id="botaoIniciar" type="submit">Iniciar jogo</button>
-        <p id="mensagem" role="status"></p>
-      </form>
+<body>
+  <main class="container">
+    <header class="cabecalho">
+      <h1>Conexão Saúde</h1>
+      <p>Desafio educativo: sarampo, poliomielite e vacinação</p>
+    </header>
+
+    <section id="telaInicial" class="cartao">
+      <h2>Prepare-se para jogar!</h2>
+
+      <p class="central">
+        Responda a 15 desafios relacionados à vacinação e às doenças
+        reemergentes. Escolha o tempo antes de começar.
+      </p>
+
+      <label for="nome">Nome ou apelido</label>
+      <input
+        id="nome"
+        type="text"
+        maxlength="40"
+        placeholder="Digite seu nome ou apelido"
+        autocomplete="nickname"
+        required
+      >
+
+      <label for="tempoEscolhido">Tempo da rodada</label>
+      <select id="tempoEscolhido">
+        <option value="60">1 minuto</option>
+        <option value="90">1 minuto e 30 segundos</option>
+        <option value="120">2 minutos</option>
+        <option value="150">2 minutos e 30 segundos</option>
+        <option value="180" selected>3 minutos</option>
+        <option value="210">3 minutos e 30 segundos</option>
+        <option value="240">4 minutos</option>
+        <option value="270">4 minutos e 30 segundos</option>
+        <option value="300">5 minutos</option>
+        <option value="360">6 minutos</option>
+        <option value="420">7 minutos</option>
+        <option value="480">8 minutos</option>
+        <option value="540">9 minutos</option>
+        <option value="600">10 minutos</option>
+      </select>
+
+      <p class="nota">
+        Cada acerto vale 10 pontos, mais bônus por rapidez de até 10 pontos.
+        Cada dica custa 5 pontos e 5 segundos. Respostas erradas e desafios
+        pulados não pontuam.
+      </p>
+
+      <button id="botaoIniciar" class="principal">
+        Iniciar jogo
+      </button>
+
+      <p id="mensagemInicial" class="mensagem" role="status"></p>
     </section>
 
-    <section id="jogo">
-      <h1>Conexão Saúde</h1>
-      <p>Boa atividade, <strong id="jogador"></strong>!</p>
-      <p>Responda às dicas na Roda de Palavras abaixo.</p>
+    <section id="telaJogo" class="cartao oculto">
+      <div class="estatisticas">
+        <div class="estatistica">
+          <span class="rotulo">Tempo restante</span>
+          <strong id="cronometro">03:00</strong>
+        </div>
 
-      <div class="moldura-jogo">
-        <iframe
-          title="Conexão Saúde — Roda de Palavras"
-          src="https://view.genially.com/6ad66b4ff18c74e07e7a2fac"
-          allowfullscreen
-          scrolling="yes">
-        </iframe>
+        <div class="estatistica">
+          <span class="rotulo">Pontuação</span>
+          <strong id="pontos">0</strong>
+        </div>
+
+        <div class="estatistica">
+          <span class="rotulo">Concluídos</span>
+          <strong id="progresso">0/15</strong>
+        </div>
       </div>
 
-      <p id="statusPontuacao">
-        Seu cadastro foi registrado. A pontuação automática ainda não está conectada.
+      <p class="central">
+        Selecione uma letra para ver o desafio correspondente.
       </p>
-      <button id="voltar" type="button">Voltar à identificação</button>
+
+      <div id="letras" class="letras"></div>
+
+      <div class="cartao">
+        <h2 id="tituloDesafio">Desafio</h2>
+        <p id="pergunta"></p>
+
+        <label for="resposta">Sua resposta</label>
+        <input
+          id="resposta"
+          type="text"
+          maxlength="100"
+          placeholder="Digite sua resposta"
+          autocomplete="off"
+        >
+
+        <div class="botoes">
+          <button id="botaoResponder" class="principal">
+            Responder
+          </button>
+
+          <button id="botaoDica" class="secundario">
+            Pedir dica (-5 pontos, -5 s)
+          </button>
+        </div>
+
+        <p id="dicaExtra" class="dica-texto oculto"></p>
+        <p id="mensagemJogo" class="mensagem" role="status"></p>
+
+        <div class="botoes">
+          <button id="botaoPular" class="secundario">
+            Pular desafio
+          </button>
+
+          <button id="botaoEncerrar" class="perigo">
+            Encerrar rodada
+          </button>
+        </div>
+      </div>
     </section>
+
+    <section id="telaResultado" class="cartao oculto">
+      <h2 class="central">Fim de jogo!</h2>
+      <p id="resumoResultado" class="central"></p>
+      <p id="mensagemSalvamento" class="central" role="status">
+        Salvando pontuação...
+      </p>
+
+      <button id="botaoJogarNovamente" class="principal">
+        Jogar novamente
+      </button>
+    </section>
+
+    <section class="cartao">
+      <h2>Ranking compartilhado</h2>
+      <p class="nota">
+        As melhores pontuações registradas pelos participantes aparecem aqui.
+      </p>
+
+      <button id="botaoAtualizarRanking" class="secundario">
+        Atualizar ranking
+      </button>
+
+      <div id="ranking" aria-live="polite">
+        Carregando ranking...
+      </div>
+    </section>
+
+    <footer class="central nota">
+      Conexão Saúde — atividade educativa para estudantes da área da saúde.
+    </footer>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // CONFIGURAÇÃO DO SUPABASE
+    // A chave publishable pode ser usada no navegador com RLS habilitado.
     const SUPABASE_URL = "https://slejqzzftvrwotifuszc.supabase.co";
     const SUPABASE_KEY = "sb_publishable_1AOWNM1KRkErfqfTCfeWfg_rmQzpO6I";
 
@@ -138,48 +450,523 @@
       SUPABASE_KEY
     );
 
-    const formulario = document.getElementById("formulario");
-    const campoNome = document.getElementById("nome");
-    const mensagem = document.getElementById("mensagem");
-    const botao = document.getElementById("botaoIniciar");
-    const identificacao = document.getElementById("identificacao");
-    const telaJogo = document.getElementById("jogo");
+    // CONFIGURAÇÕES DO JOGO
+    const TEMPO_INICIAL = 180;
+    const PONTOS_POR_ACERTO = 10;
+    const BONUS_VELOCIDADE_MAX = 10;
+    const TEMPO_PARA_PERDER_BONUS = 30;
+    const CUSTO_DICA = 5;
+    const TEMPO_DICA = 5;
 
-    formulario.addEventListener("submit", async function(evento) {
-      evento.preventDefault();
+    // OS 15 DESAFIOS
+    const desafios = [
+      {
+        letra: "A",
+        resposta: "Anticorpos",
+        aceitas: ["anticorpo", "anticorpos"],
+        pergunta: "Proteínas produzidas pelo sistema imunológico que reconhecem antígenos.",
+        dica: "Ajudam o organismo a reconhecer agentes infecciosos."
+      },
+      {
+        letra: "C",
+        resposta: "Cobertura vacinal",
+        aceitas: ["cobertura vacinal"],
+        pergunta: "Indicador que expressa a proporção da população-alvo vacinada.",
+        dica: "É importante para avaliar se a vacinação alcança a população."
+      },
+      {
+        letra: "D",
+        resposta: "Dose",
+        aceitas: ["dose", "doses"],
+        pergunta: "Quantidade de vacina administrada em uma aplicação.",
+        dica: "Pode fazer parte de um esquema com várias aplicações."
+      },
+      {
+        letra: "E",
+        resposta: "Erradicação",
+        aceitas: ["erradicacao"],
+        pergunta: "Interrupção permanente da ocorrência de uma doença em todo o mundo.",
+        dica: "A varíola é um exemplo de doença humana erradicada."
+      },
+      {
+        letra: "F",
+        resposta: "Febre",
+        aceitas: ["febre"],
+        pergunta: "Sinal que pode aparecer no sarampo, junto de outros sintomas.",
+        dica: "É o aumento da temperatura corporal."
+      },
+      {
+        letra: "G",
+        resposta: "Gotículas",
+        aceitas: ["goticula", "goticulas", "goticula respiratoria", "goticulas respiratorias"],
+        pergunta: "Partículas respiratórias que podem participar da transmissão de infecções.",
+        dica: "O sarampo também se transmite pelo ar, por partículas infecciosas."
+      },
+      {
+        letra: "I",
+        resposta: "Imunização",
+        aceitas: ["imunizacao"],
+        pergunta: "Processo pelo qual uma pessoa adquire proteção contra uma doença.",
+        dica: "Pode ser obtida por vacinação."
+      },
+      {
+        letra: "M",
+        resposta: "Manchas de Koplik",
+        aceitas: ["mancha de koplik", "manchas de koplik"],
+        pergunta: "Pequenas lesões esbranquiçadas na boca, características do sarampo.",
+        dica: "São associadas ao sarampo e podem surgir na mucosa oral."
+      },
+      {
+        letra: "N",
+        resposta: "Notificação",
+        aceitas: ["notificacao"],
+        pergunta: "Comunicação de uma suspeita ou ocorrência às autoridades de saúde, conforme as normas.",
+        dica: "Ajuda a vigilância epidemiológica a monitorar doenças."
+      },
+      {
+        letra: "O",
+        resposta: "Oral",
+        aceitas: ["oral", "via oral"],
+        pergunta: "Via de administração da vacina atenuada contra a poliomielite, conhecida como VOP.",
+        dica: "A vacina é administrada pela boca."
+      },
+      {
+        letra: "P",
+        resposta: "Poliomielite",
+        aceitas: ["poliomielite", "polio"],
+        pergunta: "Doença viral que pode atingir o sistema nervoso e causar paralisia.",
+        dica: "Também é conhecida como pólio."
+      },
+      {
+        letra: "R",
+        resposta: "Rubéola",
+        aceitas: ["rubeola"],
+        pergunta: "Doença que, assim como o sarampo, é prevenida pela vacina tríplice viral.",
+        dica: "É especialmente preocupante quando ocorre durante a gestação."
+      },
+      {
+        letra: "S",
+        resposta: "Sarampo",
+        aceitas: ["sarampo"],
+        pergunta: "Doença viral altamente contagiosa que pode causar febre e manchas na pele.",
+        dica: "A prevenção é feita com vacina que contém o componente contra essa doença."
+      },
+      {
+        letra: "T",
+        resposta: "Tríplice viral",
+        aceitas: ["triplice viral", "vacina triplice viral"],
+        pergunta: "Vacina que protege contra sarampo, caxumba e rubéola.",
+        dica: "Seu nome indica a proteção contra três doenças."
+      },
+      {
+        letra: "V",
+        resposta: "VIP",
+        aceitas: ["vip", "vacina inativada contra a poliomielite"],
+        pergunta: "Sigla da vacina inativada contra a poliomielite.",
+        dica: "As três letras significam vacina inativada contra a poliomielite."
+      }
+    ];
 
-      const nome = campoNome.value.trim();
-      if (!nome) return;
+    const $ = id => document.getElementById(id);
 
-      botao.disabled = true;
-      mensagem.textContent = "Registrando participante...";
+    let nomeJogador = "";
+    let pontuacao = 0;
+    let tempoRestante = TEMPO_INICIAL;
+    let intervalo = null;
+    let indiceAtual = 0;
+    let rodadaEncerrada = false;
+    let salvamentoEmAndamento = false;
+    let resultadoSalvo = false;
+
+    let dicasUsadas = new Set();
+    let respondidas = new Set();
+    let puladas = new Set();
+    let tempoInicioPorIndice = {};
+
+    function normalizar(texto) {
+      return texto
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function mostrarTela(id) {
+      ["telaInicial", "telaJogo", "telaResultado"].forEach(tela => {
+        $(tela).classList.toggle("oculto", tela !== id);
+      });
+    }
+
+    function formatarTempo(segundos) {
+      const minutos = Math.floor(segundos / 60);
+      const segundosRestantes = segundos % 60;
+
+      return String(minutos).padStart(2, "0") + ":" +
+        String(segundosRestantes).padStart(2, "0");
+    }
+
+    function atualizarEstatisticas() {
+      $("cronometro").textContent = formatarTempo(tempoRestante);
+      $("cronometro").classList.toggle("urgente", tempoRestante <= 15);
+      $("pontos").textContent = pontuacao;
+      $("progresso").textContent =
+        (new Set([...respondidas, ...puladas]).size) + "/" + desafios.length;
+
+      atualizarLetras();
+    }
+
+    function atualizarLetras() {
+      const botoes = $("letras").querySelectorAll("button");
+
+      botoes.forEach((botao, indice) => {
+        botao.classList.toggle("ativa", indice === indiceAtual);
+        botao.classList.toggle("correta", respondidas.has(indice));
+        botao.classList.toggle("pulada", puladas.has(indice) && !respondidas.has(indice));
+      });
+    }
+
+    function montarLetras() {
+      $("letras").innerHTML = "";
+
+      desafios.forEach((desafio, indice) => {
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "letra";
+        botao.textContent = desafio.letra;
+        botao.setAttribute("aria-label", "Desafio da letra " + desafio.letra);
+
+        botao.addEventListener("click", () => selecionarDesafio(indice));
+
+        $("letras").appendChild(botao);
+      });
+
+      atualizarLetras();
+    }
+
+    function selecionarDesafio(indice) {
+      if (rodadaEncerrada) return;
+
+      indiceAtual = indice;
+
+      // O tempo de cada desafio começa apenas na primeira vez que ele é aberto.
+      // Se o participante trocar de letra, o tempo já gasto não será reiniciado.
+      if (!tempoInicioPorIndice[indice]) {
+        tempoInicioPorIndice[indice] = Date.now();
+      }
+
+      const desafio = desafios[indice];
+
+      $("tituloDesafio").textContent = "Letra " + desafio.letra;
+      $("pergunta").textContent = desafio.pergunta;
+      $("resposta").value = "";
+      $("dicaExtra").textContent = "";
+      $("dicaExtra").classList.add("oculto");
+      $("mensagemJogo").textContent = "";
+      $("mensagemJogo").className = "mensagem";
+
+      $("botaoDica").disabled =
+        dicasUsadas.has(indice) ||
+        respondidas.has(indice);
+
+      $("botaoResponder").disabled = respondidas.has(indice);
+      $("resposta").disabled = respondidas.has(indice);
+
+      if (respondidas.has(indice)) {
+        $("mensagemJogo").textContent = "Você já acertou este desafio.";
+      } else if (puladas.has(indice)) {
+        $("mensagemJogo").textContent =
+          "Este desafio foi pulado. Você ainda pode tentar respondê-lo.";
+      }
+
+      atualizarLetras();
+      $("resposta").focus();
+    }
+
+    function iniciarRelogio() {
+      clearInterval(intervalo);
+
+      intervalo = setInterval(() => {
+        if (rodadaEncerrada) return;
+
+        tempoRestante--;
+        atualizarEstatisticas();
+
+        if (tempoRestante <= 0) {
+          tempoRestante = 0;
+          atualizarEstatisticas();
+          finalizarRodada("O tempo acabou!");
+        }
+      }, 1000);
+    }
+
+    function proximoDesafio() {
+      if (rodadaEncerrada) return;
+
+      const proximo = desafios.findIndex((_, indice) =>
+        !respondidas.has(indice) && !puladas.has(indice)
+      );
+
+      if (proximo === -1) {
+        const aindaNaoRespondido = desafios.findIndex((_, indice) =>
+          !respondidas.has(indice)
+        );
+
+        if (aindaNaoRespondido === -1) {
+          finalizarRodada("Todos os desafios foram concluídos.");
+        } else {
+          selecionarDesafio(aindaNaoRespondido);
+        }
+
+        return;
+      }
+
+      selecionarDesafio(proximo);
+    }
+
+    function responder() {
+      if (rodadaEncerrada || respondidas.has(indiceAtual)) return;
+
+      const tentativa = normalizar($("resposta").value.trim());
+
+      if (!tentativa) {
+        $("mensagemJogo").textContent = "Digite uma resposta antes de continuar.";
+        $("resposta").focus();
+        return;
+      }
+
+      const desafio = desafios[indiceAtual];
+      const respostasAceitas = [desafio.resposta, ...desafio.aceitas]
+        .map(normalizar);
+
+      if (respostasAceitas.includes(tentativa)) {
+        const segundosGastos = Math.floor(
+          (Date.now() - tempoInicioPorIndice[indiceAtual]) / 1000
+        );
+
+        // A cada 3 segundos de resposta, o bônus diminui 1 ponto.
+        // A partir de 30 segundos, o bônus é zero.
+        const bonusVelocidade = Math.max(
+          0,
+          BONUS_VELOCIDADE_MAX -
+            Math.floor(segundosGastos / 3)
+        );
+
+        const pontosGanhos = PONTOS_POR_ACERTO + bonusVelocidade;
+
+        respondidas.add(indiceAtual);
+        puladas.delete(indiceAtual);
+        pontuacao += pontosGanhos;
+
+        $("mensagemJogo").className = "mensagem resposta-certa";
+        $("mensagemJogo").textContent =
+          "Correto! +" + PONTOS_POR_ACERTO +
+          " pontos pelo acerto e +" + bonusVelocidade +
+          " de bônus de velocidade. Resposta: " + desafio.resposta + ".";
+
+        $("botaoResponder").disabled = true;
+        $("resposta").disabled = true;
+        $("botaoDica").disabled = true;
+
+        atualizarEstatisticas();
+
+        if (new Set([...respondidas, ...puladas]).size === desafios.length) {
+          setTimeout(() => finalizarRodada("Todos os desafios foram concluídos."), 900);
+        } else {
+          setTimeout(proximoDesafio, 1100);
+        }
+      } else {
+        $("mensagemJogo").className = "mensagem resposta-errada";
+        $("mensagemJogo").textContent =
+          "Resposta incorreta. Tente novamente ou peça uma dica.";
+      }
+    }
+
+    function pedirDica() {
+      if (
+        rodadaEncerrada ||
+        dicasUsadas.has(indiceAtual) ||
+        respondidas.has(indiceAtual)
+      ) return;
+
+      dicasUsadas.add(indiceAtual);
+      pontuacao = Math.max(0, pontuacao - CUSTO_DICA);
+      tempoRestante = Math.max(0, tempoRestante - TEMPO_DICA);
+
+      $("dicaExtra").textContent = "Dica: " + desafios[indiceAtual].dica;
+      $("dicaExtra").classList.remove("oculto");
+      $("botaoDica").disabled = true;
+
+      $("mensagemJogo").className = "mensagem";
+      $("mensagemJogo").textContent =
+        "Dica utilizada: -" + CUSTO_DICA + " pontos e -" +
+        TEMPO_DICA + " segundos.";
+
+      atualizarEstatisticas();
+
+      if (tempoRestante <= 0) {
+        finalizarRodada("O tempo acabou após usar uma dica.");
+      }
+    }
+
+    function pularDesafio() {
+      if (rodadaEncerrada || respondidas.has(indiceAtual)) return;
+
+      puladas.add(indiceAtual);
+
+      $("mensagemJogo").className = "mensagem";
+      $("mensagemJogo").textContent =
+        "Desafio pulado. Ele não pontua, mas você pode voltar a ele.";
+
+      atualizarEstatisticas();
+
+      if (new Set([...respondidas, ...puladas]).size === desafios.length) {
+        const faltamAcertar = desafios.some((_, indice) => !respondidas.has(indice));
+
+        if (faltamAcertar) {
+          finalizarRodada("Todos os desafios foram respondidos ou pulados.");
+        }
+      } else {
+        setTimeout(proximoDesafio, 500);
+      }
+    }
+
+    async function carregarRanking() {
+      $("ranking").textContent = "Carregando ranking...";
+
+      try {
+        const { data, error } = await cliente
+          .from("ranking")
+          .select("nome, pontuacao, createdat")
+          .order("pontuacao", { ascending: false })
+          .order("createdat", { ascending: true })
+          .limit(10);
+
+        if (error) throw error;
+
+        $("ranking").innerHTML = "";
+
+        if (!data || data.length === 0) {
+          $("ranking").textContent = "Ainda não há pontuações registradas.";
+          return;
+        }
+
+        data.forEach((jogador, indice) => {
+          const linha = document.createElement("div");
+          linha.className = "ranking-linha";
+
+          const nome = document.createElement("span");
+          nome.textContent = (indice + 1) + ". " + jogador.nome;
+
+          const pontos = document.createElement("span");
+          pontos.className = "ranking-pontos";
+          pontos.textContent = jogador.pontuacao + " pontos";
+
+          linha.append(nome, pontos);
+          $("ranking").appendChild(linha);
+        });
+      } catch (erro) {
+        console.error("Erro ao carregar ranking:", erro);
+        $("ranking").textContent =
+          "Não foi possível carregar o ranking. Verifique sua conexão e as configurações do Supabase.";
+      }
+    }
+
+    async function salvarPontuacao() {
+      if (resultadoSalvo || salvamentoEmAndamento) return;
+
+      salvamentoEmAndamento = true;
+      $("mensagemSalvamento").textContent = "Salvando pontuação...";
 
       try {
         const { error } = await cliente
           .from("ranking")
-          .insert([{ nome: nome, pontuacao: 0 }]);
+          .insert([{
+            nome: nomeJogador,
+            pontuacao: pontuacao
+          }]);
 
         if (error) throw error;
 
-        document.getElementById("jogador").textContent = nome;
-        identificacao.style.display = "none";
-        telaJogo.style.display = "block";
-        window.scrollTo(0, 0);
+        resultadoSalvo = true;
+        $("mensagemSalvamento").textContent =
+          "Pontuação registrada no ranking compartilhado!";
+        await carregarRanking();
       } catch (erro) {
-        console.error(erro);
-        mensagem.textContent =
-          "Não foi possível registrar. Confira a conexão e tente novamente.";
+        console.error("Erro ao salvar pontuação:", erro);
+        $("mensagemSalvamento").textContent =
+          "Não foi possível salvar a pontuação. Verifique a conexão e as políticas do Supabase.";
       } finally {
-        botao.disabled = false;
+        salvamentoEmAndamento = false;
       }
+    }
+
+    function finalizarRodada(motivo) {
+      if (rodadaEncerrada) return;
+
+      rodadaEncerrada = true;
+      clearInterval(intervalo);
+
+      $("resumoResultado").textContent =
+        nomeJogador + ", sua pontuação foi de " + pontuacao +
+        " pontos. " + motivo;
+
+      mostrarTela("telaResultado");
+      salvarPontuacao();
+    }
+
+    function iniciarJogo() {
+      const nomeDigitado = $("nome").value.trim();
+
+      if (!nomeDigitado) {
+        $("mensagemInicial").textContent =
+          "Digite seu nome ou apelido para iniciar.";
+        $("nome").focus();
+        return;
+      }
+
+      nomeJogador = nomeDigitado.slice(0, 40);
+      pontuacao = 0;
+      tempoRestante = Number($("tempoEscolhido").value) || TEMPO_INICIAL;
+      rodadaEncerrada = false;
+      salvamentoEmAndamento = false;
+      resultadoSalvo = false;
+
+      dicasUsadas = new Set();
+      respondidas = new Set();
+      puladas = new Set();
+      tempoInicioPorIndice = {};
+
+      $("mensagemInicial").textContent = "";
+      $("mensagemSalvamento").textContent = "Salvando pontuação...";
+      montarLetras();
+      mostrarTela("telaJogo");
+      selecionarDesafio(0);
+      atualizarEstatisticas();
+      iniciarRelogio();
+    }
+
+    $("botaoIniciar").addEventListener("click", iniciarJogo);
+    $("botaoResponder").addEventListener("click", responder);
+    $("botaoDica").addEventListener("click", pedirDica);
+    $("botaoPular").addEventListener("click", pularDesafio);
+    $("botaoEncerrar").addEventListener("click", () => {
+      finalizarRodada("Rodada encerrada pelo participante.");
+    });
+    $("botaoAtualizarRanking").addEventListener("click", carregarRanking);
+
+    $("resposta").addEventListener("keydown", evento => {
+      if (evento.key === "Enter") responder();
     });
 
-    document.getElementById("voltar").addEventListener("click", function() {
-      telaJogo.style.display = "none";
-      identificacao.style.display = "block";
-      mensagem.textContent = "";
-      window.scrollTo(0, 0);
+    $("botaoJogarNovamente").addEventListener("click", () => {
+      clearInterval(intervalo);
+      $("nome").value = "";
+      $("mensagemInicial").textContent = "";
+      mostrarTela("telaInicial");
+      $("nome").focus();
     });
+
+    carregarRanking();
   </script>
 </body>
 </html>
