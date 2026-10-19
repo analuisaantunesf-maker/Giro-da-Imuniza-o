@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexão Saúde</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #f4f0f7;
+      font-family: Arial, sans-serif;
+      color: #30243b;
+    }
+
+    .cartao {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 24px;
+      text-align: center;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px #30243b18;
+    }
+
+    h1 { color: #853f91; }
+    p { line-height: 1.6; }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border: 1px solid #c9bfd0;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 10px;
+      background: #853f91;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #jogo { display: none; }
+  </style>
+</head>
+<body>
+  <main class="cartao">
+    <section id="identificacao">
+      <h1>Conexão Saúde</h1>
+      <p>Roda de Palavras: Sarampo e Poliomielite</p>
+      <p>Digite seu nome ou apelido para começar.</p>
+
+      <form id="formulario">
+        <input
+          id="nome"
+          type="text"
+          placeholder="Seu nome ou apelido"
+          maxlength="40"
+          autocomplete="nickname"
+          required
+        >
+        <button type="submit">Iniciar jogo</button>
+      </form>
+    </section>
+
+    <section id="jogo">
+      <h1>Vamos começar!</h1>
+      <p>Bem-vindo(a), <strong id="jogador"></strong>.</p>
+      <p>Sua identificação foi recebida nesta página.</p>
+      <p>Na próxima etapa, vamos conectar esta tela à Roda de Palavras.</p>
+      <button id="voltar" type="button">Voltar</button>
+    </section>
+  </main>
+
+  <script>
+    const formulario = document.getElementById("formulario");
+    const campoNome = document.getElementById("nome");
+    const identificacao = document.getElementById("identificacao");
+    const telaJogo = document.getElementById("jogo");
+
+    formulario.addEventListener("submit", function(evento) {
+      evento.preventDefault();
+
+      const nome = campoNome.value.trim();
+      if (!nome) return;
+
+      document.getElementById("jogador").textContent = nome;
+      identificacao.style.display = "none";
+      telaJogo.style.display = "block";
+    });
+
+    document.getElementById("voltar").addEventListener("click", function() {
+      telaJogo.style.display = "none";
+      identificacao.style.display = "block";
+    });
+  </script>
+</body>
+</html>
