@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Conexão Saúde</title>
+  <title>GIRO DA IMUNIZAÇÃO</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -30,13 +30,21 @@
 
     .container {
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
       margin: auto;
     }
 
-    header { text-align: center; margin: 12px 0 22px; }
-    header h1 { color: var(--roxo); margin-bottom: 7px; }
-    header p { color: #66576c; margin-top: 0; }
+    header {
+      text-align: center;
+      margin: 12px 0 22px;
+    }
+
+    header h1 {
+      color: var(--roxo);
+      margin-bottom: 7px;
+    }
+
+    header p { color: #66576c; }
 
     .card {
       background: white;
@@ -57,7 +65,7 @@
       font-weight: bold;
     }
 
-    input, select {
+    input {
       width: 100%;
       padding: 13px;
       border: 1px solid #cfc2d4;
@@ -76,23 +84,14 @@
       cursor: pointer;
     }
 
-    button:disabled { opacity: .45; cursor: not-allowed; }
-
-    .primary {
-      background: var(--roxo);
-      color: white;
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
     }
 
-    .secondary {
-      background: var(--rosa);
-      color: var(--roxo-escuro);
-    }
-
-    .danger {
-      background: #fbe8ea;
-      color: #9f2435;
-    }
-
+    .primary { background: var(--roxo); color: white; }
+    .secondary { background: var(--rosa); color: var(--roxo-escuro); }
+    .danger { background: #fbe8ea; color: #9f2435; }
     .full { width: 100%; margin-top: 15px; }
 
     .note {
@@ -130,15 +129,20 @@
 
     .urgent { color: var(--vermelho) !important; }
 
-    /* RODA CIRCULAR */
+    /* RODA DE PALAVRAS */
     .wheel {
       position: relative;
       width: 100%;
-      max-width: 390px;
+      max-width: 410px;
       aspect-ratio: 1;
       margin: 10px auto 22px;
       border-radius: 50%;
-      background: radial-gradient(circle, white 0 35%, #f8effa 36% 67%, #ead8ef 68% 100%);
+      background: radial-gradient(
+        circle,
+        white 0 30%,
+        #f8effa 31% 66%,
+        #ead8ef 67% 100%
+      );
       border: 3px solid #d6b8df;
     }
 
@@ -148,8 +152,8 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 30%;
-      height: 30%;
+      width: 29%;
+      height: 29%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -159,7 +163,6 @@
       color: white;
       font-weight: bold;
       font-size: clamp(10px, 2.5vw, 14px);
-      box-shadow: 0 3px 10px #54235f30;
     }
 
     .wheel-letter {
@@ -167,14 +170,14 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 43px;
-      height: 43px;
+      width: 42px;
+      height: 42px;
       padding: 0;
       border-radius: 50%;
       background: white;
       color: var(--roxo-escuro);
       border: 2px solid var(--roxo);
-      font-size: 17px;
+      font-size: 16px;
       z-index: 1;
     }
 
@@ -208,6 +211,8 @@
       line-height: 1.6;
     }
 
+    .question-text { font-size: 16px; }
+
     .buttons {
       display: flex;
       flex-wrap: wrap;
@@ -223,6 +228,8 @@
       background: #fbf6dc;
       border-radius: 10px;
       line-height: 1.5;
+      overflow-wrap: anywhere;
+      font-weight: bold;
     }
 
     .message {
@@ -243,241 +250,384 @@
     }
 
     .ranking-row:last-child { border-bottom: 0; }
-    .score { font-weight: bold; color: var(--roxo); white-space: nowrap; }
+
+    .score {
+      font-weight: bold;
+      color: var(--roxo);
+      white-space: nowrap;
+    }
 
     @media (max-width: 420px) {
       body { padding: 10px; }
       .card { padding: 15px; }
-      .wheel-letter { width: 36px; height: 36px; font-size: 15px; }
+      .wheel-letter {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+      }
       .stat strong { font-size: 18px; }
+      .question { padding: 12px; }
     }
   </style>
 </head>
 
 <body>
   <main class="container">
+
     <header>
       <h1>Conexão Saúde</h1>
       <p>Sarampo, poliomielite e vacinação</p>
     </header>
 
+    <!-- TELA INICIAL -->
     <section id="screenStart" class="card">
       <h2 class="center">Vamos jogar?</h2>
+
       <p class="center">
-        Complete a roda de palavras e teste seus conhecimentos sobre vacinação
-        e doenças reemergentes.
+        Complete a roda de palavras e teste seus conhecimentos sobre
+        vacinação e doenças reemergentes.
       </p>
 
       <label for="playerName">Nome ou apelido</label>
-      <input id="playerName" maxlength="40" placeholder="Digite seu nome">
-
-      <label for="timeChoice">Tempo da rodada</label>
-      <select id="timeChoice">
-        <option value="60">1 minuto</option>
-        <option value="90">1 minuto e 30 segundos</option>
-        <option value="120">2 minutos</option>
-        <option value="150">2 minutos e 30 segundos</option>
-        <option value="180" selected>3 minutos</option>
-        <option value="210">3 minutos e 30 segundos</option>
-        <option value="240">4 minutos</option>
-        <option value="270">4 minutos e 30 segundos</option>
-        <option value="300">5 minutos</option>
-        <option value="360">6 minutos</option>
-        <option value="420">7 minutos</option>
-        <option value="480">8 minutos</option>
-        <option value="540">9 minutos</option>
-        <option value="600">10 minutos</option>
-      </select>
+      <input
+        id="playerName"
+        maxlength="40"
+        placeholder="Digite seu nome"
+        autocomplete="nickname"
+      >
 
       <p class="note">
-        Cada acerto vale 10 pontos mais um bônus de velocidade de até 10 pontos.
-        Cada dica custa 5 pontos e 5 segundos. Respostas erradas não descontam
-        pontos.
+        Cada acerto vale 10 pontos, mais bônus de velocidade de até 10 pontos.
+        Cada dica desconta 5 pontos e 5 segundos. Respostas erradas não
+        descontam pontos.
       </p>
 
-      <button id="startButton" class="primary full">Iniciar jogo</button>
+      <button id="startButton" class="primary full">
+        Iniciar jogo
+      </button>
+
       <p id="startMessage" class="message" role="status"></p>
     </section>
 
+    <!-- TELA DO JOGO -->
     <section id="screenGame" class="card hidden">
+
       <div class="stats">
         <div class="stat">
           <span>Tempo restante</span>
           <strong id="timer">03:00</strong>
         </div>
+
         <div class="stat">
           <span>Pontuação</span>
           <strong id="points">0</strong>
         </div>
+
         <div class="stat">
           <span>Acertos</span>
           <strong id="progress">0/15</strong>
         </div>
       </div>
 
-      <p class="center">Selecione uma letra da roda:</p>
+      <p class="center">Selecione um termo na roda:</p>
+
       <div id="wheel" class="wheel"></div>
 
       <div class="question">
-        <h2 id="questionTitle">Letra A</h2>
-        <p id="questionText"></p>
+        <h2 id="questionTitle">Desafio</h2>
+
+        <p id="questionText" class="question-text"></p>
 
         <label for="answer">Sua resposta</label>
-        <input id="answer" maxlength="100" placeholder="Digite sua resposta">
+
+        <input
+          id="answer"
+          maxlength="100"
+          placeholder="Digite o termo correspondente"
+          autocomplete="off"
+        >
 
         <div class="buttons">
-          <button id="answerButton" class="primary">Responder</button>
-          <button id="hintButton" class="secondary">Pedir dica</button>
+          <button id="answerButton" class="primary">
+            Responder
+          </button>
+
+          <button id="hintButton" class="secondary">
+            Pedir dica
+          </button>
         </div>
 
-        <p id="hintText" class="hint hidden"></p>
+        <p id="hintText" class="hint hidden" aria-live="polite"></p>
+
         <p id="gameMessage" class="message" role="status"></p>
 
         <div class="buttons">
-          <button id="skipButton" class="secondary">Pular desafio</button>
-          <button id="finishButton" class="danger">Encerrar rodada</button>
+          <button id="skipButton" class="secondary">
+            Pular desafio
+          </button>
+
+          <button id="finishButton" class="danger">
+            Encerrar rodada
+          </button>
         </div>
       </div>
     </section>
 
+    <!-- RESULTADO -->
     <section id="screenResult" class="card hidden">
       <h2 class="center">Fim de jogo!</h2>
+
       <p id="resultText" class="center"></p>
+
       <p id="saveMessage" class="center" role="status"></p>
-      <button id="againButton" class="primary full">Jogar novamente</button>
+
+      <button id="againButton" class="primary full">
+        Jogar novamente
+      </button>
     </section>
 
+    <!-- RANKING COMPARTILHADO -->
     <section class="card">
       <h2>Ranking compartilhado</h2>
-      <p class="note">Confira as maiores pontuações registradas.</p>
-      <button id="refreshRanking" class="secondary">Atualizar ranking</button>
-      <div id="ranking" aria-live="polite">Carregando ranking...</div>
+
+      <p class="note">
+        Confira as maiores pontuações registradas pelos participantes.
+      </p>
+
+      <button id="refreshRanking" class="secondary">
+        Atualizar ranking
+      </button>
+
+      <div id="ranking" aria-live="polite">
+        Carregando ranking...
+      </div>
     </section>
+
   </main>
 
   <script>
-    // CONEXÃO COM O SUPABASE
-    const SUPABASE_URL = "https://slejqzzftvrwotifuszc.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_1AOWNM1KRkErfqfTCfeWfg_rmQzpO6I";
+    // =========================================================
+    // CONFIGURAÇÕES DO ORGANIZADOR
+    // =========================================================
 
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_URL =
+      "https://slejqzzftvrwotifuszc.supabase.co";
 
-    // REGRAS DE PONTUAÇÃO
+    const SUPABASE_KEY =
+      "sb_publishable_1AOWNM1KRkErfqfTCfeWfg_rmQzpO6I";
+
+    // ORGANIZADOR: altere este valor para mudar o tempo da rodada.
+    // 60 = 1 min | 120 = 2 min | 180 = 3 min | 240 = 4 min
+    // 300 = 5 min | 600 = 10 min
     const DEFAULT_TIME = 180;
+
     const POINTS_CORRECT = 10;
     const MAX_SPEED_BONUS = 10;
     const SECONDS_PER_BONUS_POINT = 3;
     const HINT_POINTS_COST = 5;
     const HINT_TIME_COST = 5;
 
-    // DESAFIOS DA RODA
+    const db = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    // =========================================================
+    // OS 15 TERMOS E AS DEFINIÇÕES ENVIADAS PELA ORGANIZADORA
+    // =========================================================
+
     const challenges = [
       {
-        letter: "A",
-        answer: "Anticorpos",
-        accepted: ["anticorpo", "anticorpos"],
-        question: "Proteínas produzidas pelo sistema imunológico que reconhecem antígenos.",
-        hint: "Ajudam o organismo a reconhecer agentes infecciosos."
+        letter: "B",
+        answer: "Baixa cobertura vacinal",
+        accepted: [
+          "baixacoberturavacinal",
+          "baixa cobertura vacinal",
+          "baixa cobertura",
+          "cobertura vacinal baixa"
+        ],
+        question:
+          "Situação em que uma proporção insuficiente da população-alvo recebe a vacina recomendada, aumentando o número de pessoas suscetíveis e o risco de circulação de doenças."
+      },
+      {
+        letter: "C",
+        answer: "Calendário vacinal",
+        accepted: [
+          "calendariovacinal",
+          "calendário vacinal",
+          "calendario vacinal",
+          "calendário de vacinação",
+          "calendario de vacinacao"
+        ],
+        question:
+          "Organização das vacinas e doses recomendadas para diferentes faixas etárias e grupos populacionais, conforme as orientações do Programa Nacional de Imunizações."
       },
       {
         letter: "C",
         answer: "Cobertura vacinal",
-        accepted: ["cobertura vacinal"],
-        question: "Indicador que expressa a proporção da população-alvo vacinada.",
-        hint: "É importante para avaliar se a vacinação alcança a população."
-      },
-      {
-        letter: "D",
-        answer: "Dose",
-        accepted: ["dose", "doses"],
-        question: "Quantidade de vacina administrada em uma aplicação.",
-        hint: "Pode fazer parte de um esquema com várias aplicações."
+        accepted: [
+          "coberturavacinal",
+          "cobertura vacinal",
+          "cobertura de vacinação",
+          "cobertura de vacinacao"
+        ],
+        question:
+          "Proporção da população-alvo que recebeu determinada vacina ou dose em um local e período definidos."
       },
       {
         letter: "E",
-        answer: "Erradicação",
-        accepted: ["erradicacao"],
-        question: "Interrupção permanente da ocorrência de uma doença em todo o mundo.",
-        hint: "A varíola é um exemplo de doença humana erradicada."
+        answer: "Exantema",
+        accepted: [
+          "exantema",
+          "exantemas"
+        ],
+        question:
+          "Erupção cutânea caracterizada pelo aparecimento de manchas ou outras lesões na pele, sendo uma manifestação característica do sarampo."
       },
       {
         letter: "F",
-        answer: "Febre",
-        accepted: ["febre"],
-        question: "Sinal que pode aparecer no sarampo, junto de outros sintomas.",
-        hint: "É o aumento da temperatura corporal."
+        answer: "Fezes",
+        accepted: [
+          "fezes",
+          "fezes humanas"
+        ],
+        question:
+          "Material eliminado pelo intestino que pode conter poliovírus e contribuir para a transmissão da poliomielite pela via fecal-oral."
       },
       {
-        letter: "G",
-        answer: "Gotículas",
-        accepted: ["goticula", "goticulas", "goticulas respiratorias"],
-        question: "Partículas respiratórias que podem participar da transmissão de infecções.",
-        hint: "O sarampo também se transmite pelo ar, por partículas infecciosas."
+        letter: "I",
+        answer: "Imunidade coletiva",
+        accepted: [
+          "imunidadecoletiva",
+          "imunidade coletiva",
+          "imunidade de grupo",
+          "imunidadedegrupo",
+          "proteção coletiva",
+          "protecao coletiva"
+        ],
+        question:
+          "Proteção indireta da população quando uma proporção suficiente de pessoas está imune, dificultando a transmissão de determinadas doenças infecciosas."
       },
       {
         letter: "I",
         answer: "Imunização",
-        accepted: ["imunizacao"],
-        question: "Processo pelo qual uma pessoa adquire proteção contra uma doença.",
-        hint: "Pode ser obtida por vacinação."
-      },
-      {
-        letter: "M",
-        answer: "Manchas de Koplik",
-        accepted: ["mancha de koplik", "manchas de koplik"],
-        question: "Pequenas lesões esbranquiçadas na boca, características do sarampo.",
-        hint: "São associadas ao sarampo e podem surgir na mucosa oral."
+        accepted: [
+          "imunizacao",
+          "imunização",
+          "imunizações",
+          "imunizacoes",
+          "imunizar"
+        ],
+        question:
+          "Processo pelo qual uma pessoa adquire proteção contra uma doença, podendo ocorrer por meio da vacinação."
       },
       {
         letter: "N",
-        answer: "Notificação",
-        accepted: ["notificacao"],
-        question: "Comunicação de uma suspeita ou ocorrência às autoridades de saúde, conforme as normas.",
-        hint: "Ajuda a vigilância epidemiológica a monitorar doenças."
+        answer: "Notificação compulsória",
+        accepted: [
+          "notificacaocompulsoria",
+          "notificação compulsória",
+          "notificacao compulsoria"
+        ],
+        question:
+          "Comunicação obrigatória de doenças, agravos ou eventos de saúde pública às autoridades sanitárias, conforme as normas vigentes."
       },
       {
-        letter: "O",
-        answer: "Oral",
-        accepted: ["oral", "via oral"],
-        question: "Via de administração da vacina atenuada contra a poliomielite, conhecida como VOP.",
-        hint: "A vacina é administrada pela boca."
+        letter: "P",
+        answer: "Paralisia",
+        accepted: [
+          "paralisia",
+          "paralisias",
+          "paralise",
+          "paralisar"
+        ],
+        question:
+          "Perda parcial ou total da capacidade de movimentar uma parte do corpo, podendo ser uma sequela da poliomielite."
       },
       {
         letter: "P",
         answer: "Poliomielite",
-        accepted: ["poliomielite", "polio"],
-        question: "Doença viral que pode atingir o sistema nervoso e causar paralisia.",
-        hint: "Também é conhecida como pólio."
-      },
-      {
-        letter: "R",
-        answer: "Rubéola",
-        accepted: ["rubeola"],
-        question: "Doença que, assim como o sarampo, é prevenida pela vacina tríplice viral.",
-        hint: "É especialmente preocupante quando ocorre durante a gestação."
+        accepted: [
+          "poliomielite",
+          "poliomielites",
+          "polio",
+          "pólio"
+        ],
+        question:
+          "Doença viral que pode atingir o sistema nervoso e causar paralisia irreversível. A vacinação é a principal medida de prevenção."
       },
       {
         letter: "S",
         answer: "Sarampo",
-        accepted: ["sarampo"],
-        question: "Doença viral altamente contagiosa que pode causar febre e manchas na pele.",
-        hint: "A prevenção é feita com vacina que contém o componente contra essa doença."
+        accepted: [
+          "sarampo",
+          "sarampos"
+        ],
+        question:
+          "Doença viral altamente contagiosa, transmitida pelo ar, que pode causar febre, tosse, conjuntivite, exantema e complicações graves."
+      },
+      {
+        letter: "S",
+        answer: "Suscetibilidade",
+        accepted: [
+          "suscetibilidade",
+          "susceptibilidade",
+          "suscetível",
+          "suscetiveis",
+          "suscetíveis",
+          "susceptível",
+          "susceptíveis"
+        ],
+        question:
+          "Condição em que uma pessoa não possui proteção suficiente contra determinado agente infeccioso e pode adquirir a infecção quando exposta."
       },
       {
         letter: "T",
         answer: "Tríplice viral",
-        accepted: ["triplice viral", "vacina triplice viral"],
-        question: "Vacina que protege contra sarampo, caxumba e rubéola.",
-        hint: "Seu nome indica a proteção contra três doenças."
+        accepted: [
+          "tripliceviral",
+          "tríplice viral",
+          "triplice viral",
+          "vacina triplice viral",
+          "vacina tríplice viral"
+        ],
+        question:
+          "Vacina que protege contra sarampo, caxumba e rubéola, sendo fundamental para prevenir o sarampo."
       },
       {
         letter: "V",
-        answer: "VIP",
-        accepted: ["vip", "vacina inativada contra a poliomielite"],
-        question: "Sigla da vacina inativada contra a poliomielite.",
-        hint: "As três letras significam vacina inativada contra a poliomielite."
+        answer: "Vacina inativada (VIP)",
+        accepted: [
+          "vip",
+          "vacina inativada",
+          "vacina inativada vip",
+          "vacina contra poliomielite",
+          "vacina contra polio",
+          "vacina contra pólio"
+        ],
+        question:
+          "Vacina contra a poliomielite produzida com poliovírus inativados, utilizada para induzir proteção contra a doença."
+      },
+      {
+        letter: "V",
+        answer: "Vacinação",
+        accepted: [
+          "vacinacao",
+          "vacinação",
+          "vacinar",
+          "vacinado",
+          "vacinada",
+          "vacinados",
+          "vacinadas"
+        ],
+        question:
+          "Administração de uma vacina para estimular uma resposta imunológica e conferir proteção contra determinada doença."
       }
     ];
+
+    // =========================================================
+    // ESTADO DO JOGO
+    // =========================================================
 
     const $ = id => document.getElementById(id);
 
@@ -492,8 +642,17 @@
 
     let correctAnswers = new Set();
     let skippedAnswers = new Set();
-    let usedHints = new Set();
+
+    // Guarda o número de dicas usadas em cada desafio.
+    // Permite retornar ao desafio sem perder as letras reveladas.
+    let usedHints = new Map();
+
     let questionStartedAt = {};
+
+    // =========================================================
+    // NORMALIZAÇÃO DAS RESPOSTAS
+    // Ignora acentos, espaços, hífens e pontuação.
+    // =========================================================
 
     function normalize(value) {
       return value
@@ -503,6 +662,11 @@
         .replace(/[^a-z0-9]/g, "");
     }
 
+    // Para as dicas, usa a resposta principal sem espaços ou acentos.
+    function normalizedAnswer(challenge) {
+      return normalize(challenge.answer);
+    }
+
     function showScreen(id) {
       ["screenStart", "screenGame", "screenResult"].forEach(screen => {
         $(screen).classList.toggle("hidden", screen !== id);
@@ -510,19 +674,28 @@
     }
 
     function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return String(mins).padStart(2, "0") + ":" +
-        String(secs).padStart(2, "0");
+      return String(Math.floor(seconds / 60)).padStart(2, "0") +
+        ":" +
+        String(seconds % 60).padStart(2, "0");
     }
+
+    // =========================================================
+    // PONTUAÇÃO, TEMPO E PROGRESSO
+    // =========================================================
 
     function updateStats() {
       $("timer").textContent = formatTime(timeLeft);
       $("timer").classList.toggle("urgent", timeLeft <= 15);
       $("points").textContent = score;
-      $("progress").textContent = correctAnswers.size + "/" + challenges.length;
+      $("progress").textContent =
+        correctAnswers.size + "/" + challenges.length;
+
       updateWheel();
     }
+
+    // =========================================================
+    // CONSTRUÇÃO DA RODA CIRCULAR
+    // =========================================================
 
     function buildWheel() {
       const wheel = $("wheel");
@@ -530,20 +703,30 @@
 
       challenges.forEach((challenge, index) => {
         const button = document.createElement("button");
+
         button.type = "button";
         button.className = "wheel-letter";
         button.textContent = challenge.letter;
-        button.setAttribute("aria-label", "Letra " + challenge.letter);
 
-        // Distribui as letras ao redor de um círculo.
-        const angle = (2 * Math.PI * index / challenges.length) - Math.PI / 2;
-        const radiusPercent = 43;
-        const left = 50 + radiusPercent * Math.cos(angle);
-        const top = 50 + radiusPercent * Math.sin(angle);
+        button.setAttribute(
+          "aria-label",
+          "Desafio " + (index + 1) + ": " + challenge.letter
+        );
 
-        button.style.left = left + "%";
-        button.style.top = top + "%";
-        button.addEventListener("click", () => selectChallenge(index));
+        const angle =
+          (2 * Math.PI * index / challenges.length) - Math.PI / 2;
+
+        const radius = 43;
+
+        button.style.left =
+          (50 + radius * Math.cos(angle)) + "%";
+
+        button.style.top =
+          (50 + radius * Math.sin(angle)) + "%";
+
+        button.addEventListener("click", () => {
+          selectChallenge(index);
+        });
 
         wheel.appendChild(button);
       });
@@ -552,15 +735,29 @@
     }
 
     function updateWheel() {
-      const buttons = $("wheel").querySelectorAll(".wheel-letter");
+      $("wheel").querySelectorAll(".wheel-letter")
+        .forEach((button, index) => {
+          button.classList.toggle(
+            "active",
+            index === currentIndex
+          );
 
-      buttons.forEach((button, index) => {
-        button.classList.toggle("active", index === currentIndex);
-        button.classList.toggle("correct", correctAnswers.has(index));
-        button.classList.toggle("skipped", skippedAnswers.has(index) &&
-          !correctAnswers.has(index));
-      });
+          button.classList.toggle(
+            "correct",
+            correctAnswers.has(index)
+          );
+
+          button.classList.toggle(
+            "skipped",
+            skippedAnswers.has(index) &&
+            !correctAnswers.has(index)
+          );
+        });
     }
+
+    // =========================================================
+    // SELECIONAR UM DESAFIO
+    // =========================================================
 
     function selectChallenge(index) {
       if (finished || correctAnswers.has(index)) return;
@@ -572,22 +769,47 @@
       }
 
       const challenge = challenges[index];
+      const hintsUsed = usedHints.get(index) || 0;
+      const answerLetters = normalizedAnswer(challenge);
 
-      $("questionTitle").textContent = "Letra " + challenge.letter;
+      $("questionTitle").textContent =
+        "Desafio " + (index + 1) + " — " + challenge.letter;
+
       $("questionText").textContent = challenge.question;
+
       $("answer").value = "";
-      $("hintText").textContent = "";
-      $("hintText").classList.add("hidden");
+      $("answer").disabled = false;
+      $("answerButton").disabled = false;
+
       $("gameMessage").textContent = "";
       $("gameMessage").className = "message";
 
-      $("hintButton").disabled = usedHints.has(index);
-      $("answerButton").disabled = false;
-      $("answer").disabled = false;
+      if (hintsUsed > 0) {
+        $("hintText").textContent =
+          "Letras reveladas: " +
+          answerLetters.slice(0, Math.min(
+            hintsUsed + 1,
+            answerLetters.length
+          )).toUpperCase();
+
+        $("hintText").classList.remove("hidden");
+      } else {
+        $("hintText").textContent = "";
+        $("hintText").classList.add("hidden");
+      }
+
+      $("hintButton").disabled =
+        hintsUsed >= answerLetters.length - 1;
+
+      $("skipButton").disabled = false;
 
       updateWheel();
       $("answer").focus();
     }
+
+    // =========================================================
+    // CRONÔMETRO
+    // =========================================================
 
     function startTimer() {
       clearInterval(timerInterval);
@@ -604,6 +826,10 @@
       }, 1000);
     }
 
+    // =========================================================
+    // PRÓXIMO DESAFIO NÃO RESPONDIDO
+    // =========================================================
+
     function nextChallenge() {
       if (finished) return;
 
@@ -612,9 +838,9 @@
         return;
       }
 
-      // Procura a próxima pergunta ainda não acertada.
       for (let step = 1; step <= challenges.length; step++) {
-        const next = (currentIndex + step) % challenges.length;
+        const next =
+          (currentIndex + step) % challenges.length;
 
         if (!correctAnswers.has(next)) {
           selectChallenge(next);
@@ -623,18 +849,27 @@
       }
     }
 
+    // =========================================================
+    // VERIFICAR RESPOSTA
+    // =========================================================
+
     function submitAnswer() {
       if (finished || correctAnswers.has(currentIndex)) return;
 
       const attempt = normalize($("answer").value.trim());
 
       if (!attempt) {
+        $("gameMessage").className = "message bad";
         $("gameMessage").textContent = "Digite uma resposta.";
         return;
       }
 
       const challenge = challenges[currentIndex];
-      const accepted = [challenge.answer, ...challenge.accepted].map(normalize);
+
+      const accepted = [
+        challenge.answer,
+        ...challenge.accepted
+      ].map(normalize);
 
       if (!accepted.includes(attempt)) {
         $("gameMessage").className = "message bad";
@@ -643,59 +878,99 @@
         return;
       }
 
+      const startedAt =
+        questionStartedAt[currentIndex] || Date.now();
+
       const elapsed = Math.floor(
-        (Date.now() - questionStartedAt[currentIndex]) / 1000
+        (Date.now() - startedAt) / 1000
       );
 
       const speedBonus = Math.max(
         0,
-        MAX_SPEED_BONUS - Math.floor(elapsed / SECONDS_PER_BONUS_POINT)
+        MAX_SPEED_BONUS -
+        Math.floor(elapsed / SECONDS_PER_BONUS_POINT)
       );
 
-      const earned = POINTS_CORRECT + speedBonus;
+      score += POINTS_CORRECT + speedBonus;
 
-      score += earned;
       correctAnswers.add(currentIndex);
       skippedAnswers.delete(currentIndex);
 
       $("gameMessage").className = "message good";
       $("gameMessage").textContent =
-        "Correto! +" + POINTS_CORRECT + " pontos e +" +
-        speedBonus + " de bônus de velocidade. Resposta: " +
-        challenge.answer + ".";
+        "Correto! +" + POINTS_CORRECT +
+        " pontos e +" + speedBonus +
+        " de bônus. Resposta: " + challenge.answer + ".";
 
       $("answerButton").disabled = true;
       $("answer").disabled = true;
       $("hintButton").disabled = true;
+      $("skipButton").disabled = true;
 
       updateStats();
 
       if (correctAnswers.size === challenges.length) {
-        setTimeout(() => finishGame("Você acertou todos os desafios!"), 800);
+        setTimeout(() => {
+          finishGame("Você acertou todos os desafios!");
+        }, 800);
       } else {
-        setTimeout(nextChallenge, 1000);
+        setTimeout(() => {
+          if (!finished) nextChallenge();
+        }, 1000);
       }
     }
 
-    function requestHint() {
-      if (
-        finished ||
-        usedHints.has(currentIndex) ||
-        correctAnswers.has(currentIndex)
-      ) return;
+    // =========================================================
+    // DICAS SUCESSIVAS
+    // Cada pedido revela uma letra adicional.
+    // Cada dica custa 5 pontos e 5 segundos.
+    // =========================================================
 
-      usedHints.add(currentIndex);
+    function requestHint() {
+      if (finished || correctAnswers.has(currentIndex)) return;
+
+      const challenge = challenges[currentIndex];
+      const answerLetters = normalizedAnswer(challenge);
+
+      const hintsUsed = usedHints.get(currentIndex) || 0;
+
+      // A primeira dica revela duas letras.
+      // As seguintes revelam mais uma letra por vez.
+      const newHintsUsed = hintsUsed + 1;
+      const charactersToReveal = Math.min(
+        newHintsUsed + 1,
+        answerLetters.length
+      );
+
+      if (charactersToReveal >= answerLetters.length) {
+        $("hintButton").disabled = true;
+      }
+
+      if (hintsUsed >= answerLetters.length - 1) {
+        $("hintButton").disabled = true;
+        $("gameMessage").textContent =
+          "Todas as letras já foram reveladas.";
+        return;
+      }
+
+      usedHints.set(currentIndex, newHintsUsed);
+
       score = Math.max(0, score - HINT_POINTS_COST);
       timeLeft = Math.max(0, timeLeft - HINT_TIME_COST);
 
-      $("hintText").textContent = "Dica: " + challenges[currentIndex].hint;
+      const revealed = answerLetters
+        .slice(0, charactersToReveal)
+        .toUpperCase();
+
+      $("hintText").textContent = "Dica: " + revealed;
       $("hintText").classList.remove("hidden");
-      $("hintButton").disabled = true;
 
       $("gameMessage").className = "message";
       $("gameMessage").textContent =
-        "Dica utilizada: -" + HINT_POINTS_COST +
-        " pontos e -" + HINT_TIME_COST + " segundos.";
+        "Dica utilizada: -5 pontos e -5 segundos.";
+
+      $("hintButton").disabled =
+        charactersToReveal >= answerLetters.length;
 
       updateStats();
 
@@ -704,17 +979,29 @@
       }
     }
 
+    // =========================================================
+    // PULAR DESAFIO
+    // =========================================================
+
     function skipChallenge() {
       if (finished || correctAnswers.has(currentIndex)) return;
 
       skippedAnswers.add(currentIndex);
+
       $("gameMessage").className = "message";
       $("gameMessage").textContent =
         "Desafio pulado. Você poderá voltar a ele pela roda.";
 
       updateWheel();
-      setTimeout(nextChallenge, 500);
+
+      setTimeout(() => {
+        if (!finished) nextChallenge();
+      }, 500);
     }
+
+    // =========================================================
+    // RANKING COMPARTILHADO NO SUPABASE
+    // =========================================================
 
     async function loadRanking() {
       $("ranking").textContent = "Carregando ranking...";
@@ -732,7 +1019,8 @@
         $("ranking").innerHTML = "";
 
         if (!data || data.length === 0) {
-          $("ranking").textContent = "Ainda não há pontuações registradas.";
+          $("ranking").textContent =
+            "Ainda não há pontuações registradas.";
           return;
         }
 
@@ -741,19 +1029,22 @@
           row.className = "ranking-row";
 
           const name = document.createElement("span");
-          name.textContent = (index + 1) + ". " + entry.nome;
+          name.textContent =
+            (index + 1) + ". " + entry.nome;
 
           const points = document.createElement("span");
           points.className = "score";
-          points.textContent = entry.pontuacao + " pontos";
+          points.textContent =
+            entry.pontuacao + " pontos";
 
           row.append(name, points);
           $("ranking").appendChild(row);
         });
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao carregar ranking:", error);
+
         $("ranking").textContent =
-          "Não foi possível carregar o ranking. Confira sua conexão e o Supabase.";
+          "Não foi possível carregar o ranking. Confira sua conexão e a configuração do Supabase.";
       }
     }
 
@@ -761,28 +1052,38 @@
       if (saved || saving) return;
 
       saving = true;
-      $("saveMessage").textContent = "Salvando pontuação...";
+      $("saveMessage").textContent =
+        "Salvando pontuação...";
 
       try {
-        const { error } = await db.from("ranking").insert([{
-          nome: player,
-          pontuacao: score
-        }]);
+        const { error } = await db
+          .from("ranking")
+          .insert([{
+            nome: player,
+            pontuacao: score
+          }]);
 
         if (error) throw error;
 
         saved = true;
+
         $("saveMessage").textContent =
           "Pontuação registrada no ranking compartilhado!";
+
         await loadRanking();
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao salvar pontuação:", error);
+
         $("saveMessage").textContent =
-          "Não foi possível salvar. Verifique a conexão e as políticas do Supabase.";
+          "Não foi possível salvar a pontuação. Verifique a conexão e as políticas do Supabase.";
       } finally {
         saving = false;
       }
     }
+
+    // =========================================================
+    // ENCERRAR A RODADA
+    // =========================================================
 
     function finishGame(reason) {
       if (finished) return;
@@ -791,32 +1092,41 @@
       clearInterval(timerInterval);
 
       $("resultText").textContent =
-        player + ", você fez " + score + " pontos. " + reason;
+        player + ", você fez " + score +
+        " pontos. " + reason;
 
       showScreen("screenResult");
       saveScore();
     }
 
+    // =========================================================
+    // INICIAR / REINICIAR
+    // =========================================================
+
     function startGame() {
       const name = $("playerName").value.trim();
 
       if (!name) {
-        $("startMessage").textContent = "Digite seu nome ou apelido.";
+        $("startMessage").textContent =
+          "Digite seu nome ou apelido.";
+
         $("playerName").focus();
         return;
       }
 
       player = name.slice(0, 40);
+
       score = 0;
-      timeLeft = Number($("timeChoice").value) || DEFAULT_TIME;
+      timeLeft = DEFAULT_TIME;
       currentIndex = 0;
+
       finished = false;
       saving = false;
       saved = false;
 
       correctAnswers = new Set();
       skippedAnswers = new Set();
-      usedHints = new Set();
+      usedHints = new Map();
       questionStartedAt = {};
 
       $("startMessage").textContent = "";
@@ -829,27 +1139,59 @@
       startTimer();
     }
 
+    // =========================================================
+    // EVENTOS DOS BOTÕES
+    // =========================================================
+
     $("startButton").addEventListener("click", startGame);
-    $("answerButton").addEventListener("click", submitAnswer);
-    $("hintButton").addEventListener("click", requestHint);
-    $("skipButton").addEventListener("click", skipChallenge);
+
+    $("answerButton").addEventListener(
+      "click",
+      submitAnswer
+    );
+
+    $("hintButton").addEventListener(
+      "click",
+      requestHint
+    );
+
+    $("skipButton").addEventListener(
+      "click",
+      skipChallenge
+    );
+
     $("finishButton").addEventListener("click", () => {
       finishGame("Rodada encerrada pelo participante.");
     });
-    $("refreshRanking").addEventListener("click", loadRanking);
+
+    $("refreshRanking").addEventListener(
+      "click",
+      loadRanking
+    );
 
     $("answer").addEventListener("keydown", event => {
-      if (event.key === "Enter") submitAnswer();
+      if (event.key === "Enter") {
+        submitAnswer();
+      }
+    });
+
+    $("playerName").addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        startGame();
+      }
     });
 
     $("againButton").addEventListener("click", () => {
       clearInterval(timerInterval);
+
       $("playerName").value = "";
       $("startMessage").textContent = "";
+
       showScreen("screenStart");
       $("playerName").focus();
     });
 
+    // Carrega o ranking ao abrir a página.
     loadRanking();
   </script>
 </body>
