@@ -590,7 +590,7 @@ input:focus{
   </section>
 
   <!-- RANKING -->
-  <section class="card">
+  <section id="rankingSection" class="card hidden">
     <svg class="decoration bottom-left" style="color:var(--purple)" aria-hidden="true">
       <use href="#icon-virus"></use>
     </svg>
@@ -1269,6 +1269,8 @@ function startGame(){
   $("startMessage").textContent="";
   $("saveMessage").textContent="";
 
+  
+  $("rankingSection").classList.add("hidden");
   buildWheel();
   showScreen("screenGame");
   selectChallenge(0);
@@ -1292,6 +1294,7 @@ function finishGame(reason){
     challenges.length+" desafios.";
 
   showScreen("screenResult");
+  $("rankingSection").classList.remove("hidden");
   saveScore();
 }
 
