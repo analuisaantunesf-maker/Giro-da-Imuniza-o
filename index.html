@@ -1162,10 +1162,10 @@ async function loadRanking(){
 
   try{
     const {data,error}=await db
-      .from("ranking")
-      .select("nome,pontuacao,createdat")
+      .from("ranking")  
+      .select("nome,pontuacao,created_at")
       .order("pontuacao",{ascending:false})
-      .order("createdat",{ascending:true})
+      .order("created_at",{ascending:true})
       .limit(10);
 
     if(error)throw error;
