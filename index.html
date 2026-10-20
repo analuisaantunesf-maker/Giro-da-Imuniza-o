@@ -435,7 +435,7 @@ input:focus{
     <svg class="logo-icon" aria-hidden="true">
       <use href="#icon-shield"></use>
     </svg>
-    <h1>Conexão <span>Saúde</span></h1>
+    <h1>Giro<span>da <span>Imunização</span></h1>
     <p>Sarampo • Poliomielite • Vacinação</p>
   </header>
 
@@ -470,14 +470,16 @@ input:focus{
     <div class="rules">
       <strong>Como jogar</strong>
       <p>
-        Selecione uma letra da roda, leia a definição e digite
-        o termo correspondente. Letras repetidas representam
+        Selecione uma letra da roda, que corresponde à inicial 
+        da palavra ou do termo a ser descoberto. Leia a definição 
+        e digite a resposta correta. Letras repetidas representam 
         desafios diferentes.
       </p>
       <p>
-        Cada acerto vale 10 pontos, mais bônus de velocidade
-        de até 10 pontos. Cada dica revela uma nova letra
-        e desconta 5 pontos e 5 segundos.
+        Cada resposta correta vale 10 pontos, com até 10 pontos 
+        extras pela rapidez. Ao solicitar uma dica, uma nova 
+        letra da resposta é revelada, mas você perde 5 pontos
+        e 5 segundos do tempo restante.
       </p>
       <p>
         Você pode pular e retornar aos desafios.
@@ -620,7 +622,7 @@ const SUPABASE_KEY =
 
 // Duração da rodada em segundos.
 // 180 = 3 minutos | 240 = 4 minutos | 300 = 5 minutos
-const DEFAULT_TIME = 180;
+const DEFAULT_TIME = 300;
 
 const POINTS_CORRECT = 10;
 const MAX_SPEED_BONUS = 10;
@@ -639,8 +641,7 @@ const challenges = [
     accepted:[
       "baixacoberturavacinal",
       "baixa cobertura vacinal",
-      "baixa cobertura",
-      "cobertura vacinal baixa"
+      "baixa cobertura"
     ],
     question:"Situação em que uma proporção insuficiente da população-alvo recebe a vacina recomendada, aumentando o número de pessoas suscetíveis e o risco de circulação de doenças."
   },
@@ -652,7 +653,9 @@ const challenges = [
       "calendário vacinal",
       "calendario vacinal",
       "calendário de vacinação",
-      "calendario de vacinacao"
+      "calendario de vacinacao",
+      "calendario",
+      "calendário"
     ],
     question:"Organização das vacinas e doses recomendadas para diferentes faixas etárias e grupos populacionais, conforme as orientações do Programa Nacional de Imunizações."
   },
@@ -663,7 +666,8 @@ const challenges = [
       "coberturavacinal",
       "cobertura vacinal",
       "cobertura de vacinação",
-      "cobertura de vacinacao"
+      "cobertura de vacinacao",
+      "cobertura"
     ],
     question:"Proporção da população-alvo que recebeu determinada vacina ou dose em um local e período definidos."
   },
@@ -686,9 +690,7 @@ const challenges = [
       "imunidadecoletiva",
       "imunidade coletiva",
       "imunidade de grupo",
-      "imunidadedegrupo",
-      "proteção coletiva",
-      "protecao coletiva"
+      "imunidadedegrupo"
     ],
     question:"Proteção indireta da população quando uma proporção suficiente de pessoas está imune, dificultando a transmissão de determinadas doenças infecciosas."
   },
@@ -710,7 +712,13 @@ const challenges = [
     accepted:[
       "notificacaocompulsoria",
       "notificação compulsória",
-      "notificacao compulsoria"
+      "notificacao compulsoria",
+      "notificação",
+      "notificacao",
+      "notificaçao",
+      "notificaçao compulsoria",
+      "notificaçao compulsória"
+      
     ],
     question:"Comunicação obrigatória de doenças, agravos ou eventos de saúde pública às autoridades sanitárias, conforme as normas vigentes."
   },
@@ -762,9 +770,7 @@ const challenges = [
     accepted:[
       "tripliceviral",
       "tríplice viral",
-      "triplice viral",
-      "vacina triplice viral",
-      "vacina tríplice viral"
+      "triplice viral"
     ],
     question:"Vacina que protege contra sarampo, caxumba e rubéola, sendo fundamental para prevenir o sarampo."
   },
@@ -774,10 +780,7 @@ const challenges = [
     accepted:[
       "vip",
       "vacina inativada",
-      "vacina inativada vip",
-      "vacina contra poliomielite",
-      "vacina contra polio",
-      "vacina contra pólio"
+      "vacina inativada vip"
     ],
     question:"Vacina contra a poliomielite produzida com poliovírus inativados, utilizada para induzir proteção contra a doença."
   },
