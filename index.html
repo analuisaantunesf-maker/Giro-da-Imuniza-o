@@ -983,7 +983,22 @@ function showHint(index){
 
   // A inicial já aparece na roda.
   // Primeira dica: inicial + segunda letra.
-  const revealed=letters.slice(0,Math.min(count+1,letters.length));
+  
+const answer=challenges[index].answer.toUpperCase();
+const totalToReveal=Math.min(count+1,letters.length);
+let revealed="";
+let lettersShown=0;
+
+for(const char of answer){
+  if(/[A-ZÀ-ÖØ-Ý0-9]/i.test(char)){
+    if(lettersShown>=totalToReveal)break;
+    lettersShown++;
+  }
+  revealed+=char;
+}
+
+revealed=revealed.trimEnd();
+
 
   $("revealedLetters").textContent=revealed;
   $("hintText").classList.remove("hidden");
