@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -312,6 +310,7 @@ input:focus{
   letter-spacing:2px;
   font-size:clamp(13px,3.5vw,19px);
   overflow-wrap:anywhere;
+  white-space:pre-wrap;
 }
 .result-symbol{
   width:85px;height:85px;
@@ -973,7 +972,6 @@ function updateWheel(){
 
 function showHint(index){
   const count=usedHints.get(index)||0;
-  const letters=getAnswerLetters(index);
 
   if(count===0){
     $("hintText").classList.add("hidden");
@@ -981,26 +979,24 @@ function showHint(index){
     return;
   }
 
-  // A inicial já aparece na roda.
-  // Primeira dica: inicial + segunda letra.
-  
-const answer=challenges[index].answer.toUpperCase();
-const totalToReveal=Math.min(count+1,letters.length);
-let revealed="";
-let lettersShown=0;
+  // Mostra a estrutura completa do termo, inclusive espaços.
+  // A inicial já está na roda; cada dica revela mais uma letra.
+  const answer=challenges[index].answer.toUpperCase();
+  const visibleLetters=count+1;
+  let letterPosition=0;
+  let display="";
 
-for(const char of answer){
-  if(/[A-ZÀ-ÖØ-Ý0-9]/i.test(char)){
-    if(lettersShown>=totalToReveal)break;
-    lettersShown++;
+  for(const char of answer){
+    if(/[A-ZÀ-ÖØ-Ý0-9]/i.test(char)){
+      display+=letterPosition<visibleLetters ? char : "_";
+      letterPosition++;
+    }else{
+      // Espaços, parênteses e outros separadores não consomem dicas.
+      display+=char;
+    }
   }
-  revealed+=char;
-}
 
-revealed=revealed.trimEnd();
-
-
-  $("revealedLetters").textContent=revealed;
+  $("revealedLetters").textContent=display;
   $("hintText").classList.remove("hidden");
 }
 
@@ -1405,5 +1401,3 @@ if(localStorage.getItem(PLAYED_KEY)==="1")loadRanking();
 </script>
 </body>
 </html>
-
-
