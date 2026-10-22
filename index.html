@@ -358,16 +358,6 @@ input:focus{
 }
 
 /* Destaque minimalista do top 3 */
-.ranking-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:17px 0 12px}
-.podium-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:16px 6px;border-radius:15px;min-width:0;background:#e9f5f6;border:1px solid var(--line)}
-.podium-place-1{background:#def3f4;border-color:#a6d1d3;order:2}
-.podium-place-2{background:#f3f4f7;border-color:#dfe8e9;order:1}
-.podium-place-3{background:#e9f1f0;border-color:#c9dfdf;order:3}
-.podium-medal{font-size:27px;line-height:1.2}
-.podium-position{font-size:11px;font-weight:700;color:var(--muted)}
-.podium-name{font-size:13px;font-weight:700;overflow-wrap:anywhere;max-width:100%}
-.podium-points{font-size:15px;color:var(--deep)}
-.ranking-remaining{margin-top:7px}
 
 </style>
 </head>
@@ -609,18 +599,17 @@ input:focus{
     </svg>
 
     <div class="ranking-title">
-      <svg aria-hidden="true"><use href="#icon-trophy"></use></svg>
-      <h2>Ranking compartilhado</h2>
+      <h2>Pontuações dos participantes</h2>
     </div>
 
-    <p class="subtitle">Os 10 melhores resultados, um por participante.</p>
+    <p class="subtitle">Lista de participantes e suas melhores pontuações registradas.</p>
 
     <div id="ranking" aria-live="polite">
-      Carregando ranking...
+      Carregando pontuações...
     </div>
 
     <button id="refreshRanking" class="btn btn-outline full">
-      Atualizar ranking
+      Atualizar pontuações
     </button>
   </section>
 </main>
@@ -1191,14 +1180,14 @@ function startTimer(){
 }
 
 // ======================================================
-// RANKING SUPABASE
+// LISTA DE PONTUAÇÕES SUPABASE
 // ======================================================
 
 async function loadRanking(){
-  $("ranking").textContent="Carregando ranking...";
+  $("ranking").textContent="Carregando pontuações...";
 
   if(!db){
-    $("ranking").textContent="Não foi possível iniciar a conexão com o ranking.";
+    $("ranking").textContent="Não foi possível conectar à lista de pontuações.";
     return;
   }
 
@@ -1207,8 +1196,7 @@ async function loadRanking(){
     // de cada jogador_id, incluindo registros antigos sem identificador.
     const {data,error}=await db.from("ranking_melhores")
       .select("nome,pontuacao,jogador_id")
-      .order("pontuacao",{ascending:false})
-      .limit(10);
+      .order("pontuacao",{ascending:false});
 
     if(error)throw error;
     $("ranking").replaceChildren();
@@ -1218,48 +1206,25 @@ async function loadRanking(){
       return;
     }
 
-    const podium=document.createElement("div");
-    podium.className="ranking-podium";
-    const remaining=document.createElement("div");
-    remaining.className="ranking-remaining";
-    const medals=["🥇","🥈","🥉"];
-
-    data.forEach((entry,index)=>{
-      const isMine=entry.jogador_id===getPlayerId();
+    data.forEach(entry=>{
       const row=document.createElement("div");
-      if(index<3){
-        row.className="podium-item podium-place-"+(index+1);
-        const medal=document.createElement("span");
-        medal.className="podium-medal";
-        medal.textContent=medals[index];
-        const position=document.createElement("span");
-        position.className="podium-position";
-        position.textContent=(index+1)+"º lugar";
-        const name=document.createElement("span");
-        name.className="podium-name";
-        name.textContent=entry.nome+(isMine?" (você)":"");
-        const points=document.createElement("strong");
-        points.className="podium-points";
-        points.textContent=entry.pontuacao+" pts";
-        row.append(medal,position,name,points);
-        podium.appendChild(row);
-      }else{
-        row.className="ranking-row";
-        const name=document.createElement("span");
-        name.className="ranking-name";
-        name.textContent=(index+1)+"º  "+entry.nome+(isMine?" (você)":"");
-        const points=document.createElement("span");
-        points.className="ranking-score";
-        points.textContent=entry.pontuacao+" pts";
-        row.append(name,points);
-        remaining.appendChild(row);
-      }
+      row.className="ranking-row";
+
+      const name=document.createElement("span");
+      name.className="ranking-name";
+      name.textContent=entry.nome;
+
+      const points=document.createElement("span");
+      points.className="ranking-score";
+      points.textContent=entry.pontuacao+" pontos";
+
+      row.append(name,points);
+      $("ranking").appendChild(row);
     });
-    $("ranking").append(podium,remaining);
   }catch(error){
-    console.error("Erro ao consultar ranking:",error);
+    console.error("Erro ao consultar pontuações:",error);
     $("ranking").textContent=
-      "Não foi possível carregar o ranking. Confira a configuração do Supabase.";
+      "Não foi possível carregar as pontuações. Confira a configuração do Supabase.";
   }
 }
 
@@ -1269,7 +1234,7 @@ async function saveScore(){
   $("saveMessage").textContent="Salvando pontuação...";
 
   if(!db){
-    $("saveMessage").textContent="Conexão com o ranking indisponível.";
+    $("saveMessage").textContent="Conexão com as pontuações indisponível.";
     saving=false;
     return;
   }
@@ -1287,7 +1252,7 @@ async function saveScore(){
     saved=true;
     localStorage.setItem(PLAYED_KEY,"1");
     localStorage.setItem(PLAYER_NAME_KEY,player);
-    $("saveMessage").textContent="Pontuação registrada! Seu melhor resultado aparece no ranking.";
+    $("saveMessage").textContent="Pontuação registrada! Seu melhor resultado aparece na lista.";
     await loadRanking();
   }catch(error){
     console.error("Erro ao salvar:",error);
@@ -1393,8 +1358,8 @@ $("againButton").addEventListener("click",()=>{
   $("playerName").focus();
 });
 
-// Na primeira visita o ranking fica oculto. Ao retornar após uma
-// partida salva, o nome e o ranking são exibidos na tela inicial.
+// Na primeira visita a lista fica oculta. Após uma partida salva,
+// o nome e as pontuações aparecem na tela inicial.
 $("playerName").value=localStorage.getItem(PLAYER_NAME_KEY)||"";
 showScreen("screenStart");
 if(localStorage.getItem(PLAYED_KEY)==="1")loadRanking();
